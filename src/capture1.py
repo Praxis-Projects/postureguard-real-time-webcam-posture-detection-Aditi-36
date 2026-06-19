@@ -33,7 +33,7 @@ while vid.isOpened():
             23: "Left Hip",
             24: "Right Hip"
         }
-        print("\n--- Current Frame Landmark Coordinates ---")
+        print("\n Current Frame Landmark Coordinates")
         for idx, name in target_landmarks.items():
             lm = landmarks[idx]
             # Coordinates are normalized (0.0 to 1.0) relative to image dimensions
