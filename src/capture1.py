@@ -19,10 +19,31 @@ while vid.isOpened():
     
     #make detection
     results = pose.process(frame_rgb)
-    
-    #recolouring the image back to bgr for rendering 
+        #recolouring the image back to bgr for rendering 
     image.flags.writeable = True
     frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    if results.pose_landmarks:
+        # Access all 33 landmarks as a list
+        landmarks = results.pose_landmarks.landmark
+         # Dictionary of the target landmarks requested
+        target_landmarks = {
+            0: "Nose",
+            11: "Left Shoulder",
+            12: "Right Shoulder",
+            23: "Left Hip",
+            24: "Right Hip"
+        }
+        print("\n--- Current Frame Landmark Coordinates ---")
+        for idx, name in target_landmarks.items():
+            lm = landmarks[idx]
+            # Coordinates are normalized (0.0 to 1.0) relative to image dimensions
+            print(f"{name} (ID {idx:02d}) -> x: {lm.x:.4f} | y: {lm.y:.4f} | z: {lm.z:.4f} | Visibility: {lm.visibility:.4f}")
+            mp_drawing.draw_landmarks(
+            frame, 
+            results.pose_landmarks, 
+            mp_pose.POSE_CONNECTIONS
+        )
+
     
    
     mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
