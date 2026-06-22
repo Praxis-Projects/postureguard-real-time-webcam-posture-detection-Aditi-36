@@ -10,6 +10,6 @@ A Python-based project developed during my internship focused on computer vision
 ## 📂 Project Structure
 ```text
 ├── src/
-│   └── capture1.py       # Main script for capturing and refining landmark coordinates
+│   └── capture.py       # Main script for capturing and refining landmark coordinates
 ├── requirements.txt      # Project dependencies
 └── README.md             # Project documentation
