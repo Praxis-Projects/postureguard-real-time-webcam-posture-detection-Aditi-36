@@ -1,5 +1,5 @@
 import pytest
-from src.anglecalc import compute_posture_metrics
+from anglecalc import compute_posture_metrics
 
 @pytest.fixture
 def perfect_posture_data():
