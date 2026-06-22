@@ -7,12 +7,17 @@ from mediapipe.tasks.python.vision import drawing_utils
 import time
 import cv2
 
+# Import math engine
+from anglecalc import compute_posture_metrics
+
 if TYPE_CHECKING:
     pass
 
 
 TARGET_LANDMARKS = {
     0: "nose",
+    7: "left_ear",
+    8: "right_ear",
     11: "left_shoulder",
     12: "right_shoulder",
     23: "left_hip",
@@ -87,7 +92,7 @@ with vision.PoseLandmarker.create_from_options(options) as detector:
             pose_landmarks = latest_result.pose_landmarks[0]
             
             # Print requested landmark coordinates directly to console
-            print(f"--- Frame {frame_count} Landmark Data ---")
+            print(f"Frame {frame_count} Landmark Data ")
             for idx, name in TARGET_LANDMARKS.items():
                 if idx < len(pose_landmarks):
                     landmark = pose_landmarks[idx]
@@ -100,15 +105,15 @@ with vision.PoseLandmarker.create_from_options(options) as detector:
                     image=frame,
                     landmark_list=pose_landmarks_list,
                     connections=vision.PoseLandmarksConnections.POSE_LANDMARKS,
-                    landmark_drawing_spec=drawing_utils.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=2),
-                    connection_drawing_spec=drawing_utils.DrawingSpec(color=(0, 0, 255), thickness=2)
+                    landmark_drawing_spec=drawing_utils.DrawingSpec(color=(204, 153, 255), thickness=2, circle_radius=2),
+                    connection_drawing_spec=drawing_utils.DrawingSpec(color=(255, 153, 204), thickness=2)
                 )
             
             # Enhanced hand visualization with explicit drawing
             h, w, c = frame.shape
             for hand_idx, hand_indices in enumerate([LEFT_HAND_INDICES, RIGHT_HAND_INDICES]):
                 hand_name = "LEFT" if hand_idx == 0 else "RIGHT"
-                hand_color = (255, 0, 0) if hand_idx == 0 else (0, 0, 255)  # Blue for left, Red for right
+                hand_color = (255, 153, 0) if hand_idx == 0 else (0, 153, 255)  # Blue for left, Red for right
                 
                 # Draw hand landmarks as larger circles
                 for idx in hand_indices:
