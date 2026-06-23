@@ -109,6 +109,23 @@ with vision.PoseLandmarker.create_from_options(options) as detector:
                     connection_drawing_spec=drawing_utils.DrawingSpec(color=(255, 153, 204), thickness=2)
                 )
             
+            # Convert MediaPipe landmarks to dictionary format for posture metrics
+            landmarks_dict = {}
+            for idx, name in TARGET_LANDMARKS.items():
+                if idx < len(pose_landmarks):
+                    landmark = pose_landmarks[idx]
+                    landmarks_dict[name] = {
+                        'x': landmark.x,
+                        'y': landmark.y,
+                        'visibility': landmark.visibility
+                    }
+            
+            # Compute posture metrics
+            posture_metrics = compute_posture_metrics(landmarks_dict)
+            print(f"Posture Metrics: {posture_metrics}")
+            print(f"Verdict: {posture_metrics['verdict']}")
+            print()
+            
             # Enhanced hand visualization with explicit drawing
             h, w, c = frame.shape
             for hand_idx, hand_indices in enumerate([LEFT_HAND_INDICES, RIGHT_HAND_INDICES]):
