@@ -1,0 +1,8 @@
+# Posture Thresholds
+neck_threshold_degrees: 15.0
+shoulder_threshold_pct: 5.0
+back_threshold_ratio: 0.15
+
+# Alert Engine Logic
+alert_delay_seconds: 30
+cooldown_minutes: 5

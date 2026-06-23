@@ -9,6 +9,8 @@ import cv2
 
 # Import math engine
 from anglecalc import compute_posture_metrics
+from alerts import PostureAlertEngine
+alert_system = PostureAlertEngine()
 
 if TYPE_CHECKING:
     pass
@@ -122,8 +124,9 @@ with vision.PoseLandmarker.create_from_options(options) as detector:
             
             # Compute posture metrics
             posture_metrics = compute_posture_metrics(landmarks_dict)
-            print(f"Posture Metrics: {posture_metrics}")
-            print(f"Verdict: {posture_metrics['verdict']}")
+            alert_system.process_frame_verdict(posture_metrics)
+            print(f"Posture Metrics - Neck: {posture_metrics['neck_angle']}°, Shoulder: {posture_metrics['shoulder_slope']}%, Back: {posture_metrics['back_curvature']}")
+            print(f"Verdict: {posture_metrics['verdict']} | Reason: {posture_metrics['reason']}")
             print()
             
             # Enhanced hand visualization with explicit drawing
