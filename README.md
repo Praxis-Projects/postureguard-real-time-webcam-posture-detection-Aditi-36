@@ -1,4 +1,6 @@
 # Internship Project: Pose Landmark Tracker & Posture Analysis
+# postureguard-real-time-webcam-posture-detection-Aditi-36
+Praxis internship project: PostureGuard — Real-Time Webcam Posture Detection
 
 A Python-based computer vision application for real-time pose detection and posture analysis. The project captures pose landmarks from a live camera feed using MediaPipe and computes detailed posture metrics including neck inclination, shoulder slope, and back curvature.
 
@@ -97,3 +99,4 @@ Posture is classified as **GOOD** when all metrics are within thresholds, otherw
 - Computes three posture metrics from landmark coordinates
 - Provides per-frame verdict (GOOD/POOR)
 - Handles edge cases and visibility thresholds
+
