@@ -1,102 +1,100 @@
-# Internship Project: Pose Landmark Tracker & Posture Analysis
-# postureguard-real-time-webcam-posture-detection-Aditi-36
-Praxis internship project: PostureGuard — Real-Time Webcam Posture Detection
+# PostureGuard — Real-Time Posture Analysis (Internship Project)
 
-A Python-based computer vision application for real-time pose detection and posture analysis. The project captures pose landmarks from a live camera feed using MediaPipe and computes detailed posture metrics including neck inclination, shoulder slope, and back curvature.
+Lightweight Python project that uses MediaPipe Tasks and OpenCV to detect
+pose landmarks from a webcam, compute posture metrics, and expose telemetry
+via a local Flask dashboard.
 
-## 🚀 Features
-* **Real-Time Pose Detection:** Uses MediaPipe's pose landmarker for accurate, low-latency landmark detection
-* **Live Posture Metrics:** Computes neck angle, shoulder slope, and back curvature in real-time
-* **Verdict System:** Classifies posture as GOOD or POOR based on configurable thresholds
-* **Landmark Visualization:** Draws pose skeleton and hand landmarks on the live feed
-* **FPS Benchmarking:** Monitors and displays performance metrics
-* **Modular Architecture:** Cleanly separated concerns with dedicated modules for capture and angle calculations
+## Quick overview
+- Live webcam posture analysis (OpenCV + MediaPipe Tasks)
+- Web dashboard served by `src/app.py` with a WebSocket telemetry feed
+- Background posture engine in `src/capture.py` that exposes frames and metrics
+- Unit tests located in `tests/` (run with `pytest`)
 
-## 📂 Project Structure
+## Repository layout
 ```text
+.
+├── config.yaml
+├── pose_landmarker_lite.task   # MediaPipe task model (required at runtime)
+├── requirements.txt            # Python dependencies
 ├── src/
-│   ├── capture.py           # Main script: captures camera feed and displays pose landmarks
-│   └── anglecalc.py         # Posture metrics engine: computes neck, shoulder, and back angles
+│   ├── app.py                  # Flask web server + WS broadcaster
+│   ├── capture.py              # PostureAnalyzer: camera loop & ML integration
+│   ├── anglecalc.py            # Posture metrics computation
+│   ├── alerts.py               # Alerting engine used during sessions
+│   └── templates/
+│       └── index.html          # Web dashboard UI
 ├── tests/
-│   ├── test_angles.py       # Unit tests for posture metrics
-│   ├── test_landmarks.py    # Unit tests for landmark processing
-│   └── conftest.py          # Test fixtures and configuration
-├── pose_landmarker_lite.task # MediaPipe pose model
-├── requirements.txt          # Project dependencies
-└── README.md                 # Project documentation
+│   ├── conftest.py
+│   ├── test_alert.py
+│   ├── test_angles.py
+│   └── test_landmarks.py
+└── README.md
 ```
 
-## 📋 Requirements
-- Python 3.x
-- MediaPipe Tasks
-- OpenCV (cv2)
-- pytest (for testing)
+## Requirements
+- Python 3.10+ recommended
+- See `requirements.txt` (installs `mediapipe`, `opencv-python`, `Flask`, `pytest`, etc.)
 
-See `requirements.txt` for full dependency list.
+Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-## 🔧 Installation & Setup
+Important: ensure `pose_landmarker_lite.task` is present in the project root —
+the capture engine and `src/app.py` expect the model at that path.
 
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Running
 
-2. **Ensure the pose model is present:**
-   - The `pose_landmarker_lite.task` file should be in the project root directory
+1) Run the web dashboard (recommended):
 
-## ▶️ Running the Application
+```bash
+python src/app.py
+```
 
-Start the live pose detection and posture analysis:
+Then open http://127.0.0.1:5000 in your browser. The Flask app spawns a
+background `PostureAnalyzer` (from `src/capture.py`) and serves a live MJPEG
+video feed plus WebSocket telemetry to the dashboard.
+
+2) Run the capture script standalone (desktop preview):
+
 ```bash
 python src/capture.py
 ```
 
-**Controls:**
-- Press `q` in the video window to quit
+This opens an OpenCV window showing real-time overlays. Press `q` in the
+window to quit.
 
-**Output:**
-- Real-time landmark coordinates (nose, ears, shoulders, hips)
-- Posture metrics: neck angle, shoulder slope, back curvature
-- Verdict: GOOD (all metrics within thresholds) or POOR (metrics exceed thresholds)
-- FPS performance metrics (updated every 30 frames)
+## Tests
 
-## 🧪 Testing
+Run the full test suite with:
 
-Run the test suite:
 ```bash
-pytest tests/
+pytest -q
 ```
 
-Individual test files:
+Or run an individual test file, for example:
+
 ```bash
-pytest tests/test_angles.py        # Posture metrics tests
-pytest tests/test_landmarks.py     # Landmark processing tests
+pytest tests/test_angles.py -q
 ```
 
-## 📊 Posture Metrics
+## File descriptions
+- `src/capture.py`: Background MediaPipe PoseLandmarker wrapper exposing
+   `PostureAnalyzer` with thread-safe fields (`latest_frame`, `neck_angle`, etc.).
+- `src/anglecalc.py`: Functions to compute `neck_angle`, `shoulder_slope`,
+   `back_curvature` and the per-frame `verdict`.
+- `src/alerts.py`: Alerting logic used when sessions are active.
+- `src/app.py`: Flask server and WebSocket broadcaster that integrates the
+   background analyzer and serves `templates/index.html`.
 
-The application evaluates three key metrics:
+## Troubleshooting
+- If the camera is not detected, ensure no other application is using it and
+   that OpenCV can access `/dev/video*` (or the correct device on Windows).
+- If MediaPipe fails to load the model, verify `pose_landmarker_lite.task` is
+   present and readable in the project root.
 
-| Metric | Threshold | Description |
-|--------|-----------|-------------|
-| **Neck Angle** | ≤ 15° | Inclination of head relative to shoulders |
-| **Shoulder Slope** | ≤ 5% | Asymmetry/slope between left and right shoulders |
-| **Back Curvature** | ≤ 0.15 | Curvature of spine based on nose and hip positions |
+## Next steps
+- Add README badges for build/tests or a short demo GIF (optional).
 
-Posture is classified as **GOOD** when all metrics are within thresholds, otherwise **POOR**.
-
-## 🎯 Key Modules
-
-### `capture.py`
-- Initializes MediaPipe pose landmarker in LIVE_STREAM mode
-- Processes camera frames asynchronously
-- Extracts and converts pose landmarks to dictionary format
-- Calls posture metrics computation
-- Visualizes pose skeleton and hand landmarks
-
-### `anglecalc.py`
-- Core posture analysis engine
-- Computes three posture metrics from landmark coordinates
-- Provides per-frame verdict (GOOD/POOR)
-- Handles edge cases and visibility thresholds
+If you'd like, I can also run the tests or commit these README changes.
 
