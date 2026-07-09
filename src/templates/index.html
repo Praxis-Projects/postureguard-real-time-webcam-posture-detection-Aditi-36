@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PostureGuard Workspace</title>
+    <style>
+        body { font-family: sans-serif; display: flex; margin: 0; background: #121214; color: white; }
+        #sidebar { width: 300px; padding: 20px; background: #1a1a1e; height: 100vh; border-right: 1px solid #333; }
+        #main-content { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .badge { padding: 8px 16px; border-radius: 4px; font-weight: bold; display: inline-block; }
+        .good { background: #2e7d32; }
+        .poor { background: #c62828; }
+        #alert-banner { display: none; background: #ff1744; color: white; padding: 15px; width: 100%; text-align: center; font-weight: bold; position: fixed; top: 0; left: 0; z-index: 1000; }
+        button { padding: 10px 20px; margin: 10px 5px; cursor: pointer; font-weight: bold; }
+        #summary-modal { display: none; background: rgba(0,0,0,0.8); position: fixed; top:0; left:0; width:100%; height:100%; justify-content: center; align-items: center; }
+        .modal-content { background: #222; padding: 30px; border-radius: 8px; max-width: 400px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div id="alert-banner">
+        ⚠️ POOR POSTURE DETECTED! PLEASE SIT UP STRAIGHT.
+        <button onclick="document.getElementById('alert-banner').style.display='none'" style="margin-left:20px; padding:2px 5px;">Dismiss</button>
+    </div>
+
+    <div id="sidebar">
+        <h2>PostureGuard Metrics</h2>
+        <hr style="border-color: #333;">
+        <p>Status: <span id="verdict-badge" class="badge good">GOOD</span></p>
+        <p>Neck Angle: <span id="ui-neck-angle">0</span>°</p>
+        <p>Session Time: <span id="ui-timer">00:00:00</span></p>
+        <p>Alert Count: <span id="ui-alerts">0</span></p>
+
+        <button onclick="startSession()" style="background:#4caf50; color:white;">Start Session</button>
+        <button onclick="stopSession()" style="background:#f44336; color:white;">End Session</button>
+    </div>
+
+    <div id="main-content">
+        <h1>Live Browser Detection</h1>
+        <img id="video-stream" src="/video_feed" width="640" height="480" style="border-radius: 8px; border: 2px solid #333;" alt="Webcam Feed">
+    </div>
+
+    <div id="summary-modal">
+        <div class="modal-content">
+            <h2>Session Summary</h2>
+            <div id="summary-data" style="text-align: left; margin: 20px 0;"></div>
+            <button onclick="document.getElementById('summary-modal').style.display='none'">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // app.py exposes a single WebSocket endpoint at /ws for both
+        // sending commands (start/stop/calibrate) and receiving live
+        // telemetry pushed ~10x/second, so the frontend talks to it
+        // over one persistent connection rather than polling REST routes.
+        let socket;
+        let sessionTimerStart = null;
+        let timerInterval;
+
+        function connectSocket() {
+            const proto = window.location.protocol === "https:" ? "wss://" : "ws://";
+            socket = new WebSocket(proto + window.location.host + "/ws");
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+
+                if (data.type === "summary") {
+                    showSummary(data);
+                    return;
+                }
+
+                // Regular telemetry packet
+                document.getElementById('ui-neck-angle').innerText = data.neck_angle;
+                document.getElementById('ui-alerts').innerText = data.alert_count;
+                document.getElementById('ui-timer').innerText = data.elapsed_time;
+
+                const badge = document.getElementById('verdict-badge');
+                badge.innerText = data.verdict;
+                if (data.verdict === "GOOD") {
+                    badge.className = "badge good";
+                    document.getElementById('alert-banner').style.display = 'none';
+                } else {
+                    badge.className = "badge poor";
+                }
+
+                if (data.alert_triggered) {
+                    document.getElementById('alert-banner').style.display = 'block';
+                }
+            };
+
+            socket.onclose = () => {
+                // Auto-reconnect if the connection drops
+                setTimeout(connectSocket, 1000);
+            };
+        }
+
+        function sendCommand(action) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ action: action }));
+            }
+        }
+
+        function startSession() {
+            sendCommand("start_session");
+        }
+
+        function stopSession() {
+            sendCommand("stop_session");
+        }
+
+        function showSummary(summary) {
+            document.getElementById('summary-data').innerHTML = `
+                <p><strong>Total Duration:</strong> ${summary.duration}</p>
+                <p><strong>Good Posture Time:</strong> ${summary.accuracy}%</p>
+                <p><strong>Alerts Triggered:</strong> ${summary.alerts}</p>
+                <p><strong>Avg Neck Angle:</strong> ${summary.avg_neck}°</p>
+            `;
+            document.getElementById('summary-modal').style.display = 'flex';
+        }
+
+        connectSocket();
+    </script>
+</body>
+</html>

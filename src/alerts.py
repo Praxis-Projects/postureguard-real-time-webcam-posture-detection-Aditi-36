@@ -5,8 +5,9 @@ import yaml
 from plyer import notification
 
 class PostureAlertEngine:
-    def __init__(self, config_path="config.yaml"):
+    def __init__(self, config_path="config.yaml", alert_callback=None):
         self.config_path = config_path
+        self.alert_callback = alert_callback
         self.load_config()
         
         # State tracking variables
@@ -103,7 +104,9 @@ class PostureAlertEngine:
                 # Fire alert notifications and transition states
                 self.trigger_desktop_notification(metrics["reason"])
                 self.log_alert_to_csv(trigger_type, trigger_val)
-                
+                if self.alert_callback:
+                    self.alert_callback()
+
                 self.last_alert_time = current_time
                 self.in_cooldown = True
                 self.poor_streak_start_time = None
