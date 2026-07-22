@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en" class="light scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostureGuard Workspace</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',   // Premium Sky Blue 50
+                            100: '#e0f2fe',  // Premium Sky Blue 100
+                            500: '#0ea5e9',  // Vibrant Sky Blue 500
+                            600: '#0284c7',  // Premium Sky Blue 600
+                            900: '#0c4a6e',  // Dark Blue 900
+                        },
+                        slate: {
+                            950: '#0b0f19',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;950&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .glow-green {
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.25);
+        }
+        .glow-red {
+            box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.3);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .light ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-[#FDFBF7] text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col antialiased">
+
+    <!-- Header Navigation -->
+    <header class="bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800/80 px-6 py-4 flex items-center justify-between sticky top-0 z-40 transition-colors">
+        <div class="flex items-center space-x-3">
+            <div class="bg-brand-500 text-white p-2.5 rounded-xl font-bold flex items-center justify-center shadow-lg shadow-brand-500/20">
+                <i class="fa-solid fa-user-shield text-xl animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-black tracking-tight text-slate-900 dark:text-white flex items-center">
+                    PostureGuard
+                </h1>
+                <p class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 dark:text-slate-500">Real-Time Posture Analytics</p>
+            </div>
+        </div>
+
+        <!-- Desktop Navigation Items -->
+        <nav class="hidden lg:flex items-center space-x-8 font-medium text-sm text-slate-600 dark:text-slate-300">
+            <a href="#how-it-works" class="hover:text-brand-500 transition-colors">How it works</a>
+            <a href="#demo" class="hover:text-brand-500 transition-colors flex items-center space-x-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-ping"></span>
+                <span>Live Demo</span>
+            </a>
+            <a href="#about" class="hover:text-brand-500 transition-colors">About</a>
+        </nav>
+
+        <!-- Right Utility Stack -->
+        <div class="flex items-center space-x-4">
+            <!-- Theme Toggle Button -->
+            <button onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-brand-500 dark:hover:text-brand-500 transition-all" title="Toggle Theme">
+                <i id="themeIcon" class="fa-solid fa-moon text-lg"></i>
+            </button>
+
+            <div class="flex items-center space-x-2 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200/50 dark:border-slate-700/50">
+                <button id="muteBtn" onclick="toggleMute()" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors" title="Toggle Sound Alerts">
+                    <i id="muteIcon" class="fa-solid fa-volume-high text-brand-500"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Dashboard Grid -->
+    <main id="demo" class="flex-grow py-12 px-6 max-w-7xl mx-auto w-full">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <span class="text-brand-500 font-extrabold text-xs uppercase tracking-widest bg-brand-100 dark:bg-brand-900/20 px-3 py-1 rounded-full">Flask Engine: Active</span>
+            <h2 class="text-3xl md:text-4xl font-black tracking-tight mt-3 mb-4 text-slate-900 dark:text-white">Workspace Dashboard</h2>
+            <p class="text-slate-600 dark:text-slate-400 text-sm md:text-base">Webcam MJPEG stream processed on host hardware using high-precision pose alignment mapping.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            
+            <!-- Left Side: Live Feed Container (7 Cols) -->
+            <div class="lg:col-span-7 flex flex-col space-y-6">
+                <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-none flex flex-col transition-colors">
+                    <div class="bg-slate-50/50 dark:bg-slate-800/30 px-4 py-3 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-camera text-slate-400"></i>
+                            <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Live Postural Camera Analytics</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span id="backendStatusBadge" class="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase flex items-center space-x-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                <span>Connected</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- MJPEG Video Render Element -->
+                    <div class="relative bg-slate-950 aspect-video flex items-center justify-center overflow-hidden">
+                        <img id="mjpegFeed" src="/video_feed" class="w-full h-full object-cover max-h-[480px]" alt="Webcam Analytics Feed" onerror="handleImageError()" />
+                        
+                        <!-- Fallback visual indicator in case of complete hardware failure -->
+                        <div id="offlineOverlay" class="hidden absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center text-center p-6 z-10">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-4xl mb-4"></i>
+                            <h4 class="text-white font-bold text-lg">Server Feed Unreachable</h4>
+                            <p class="text-slate-400 text-sm max-w-sm mt-2">Could not establish connection with local Flask stream. Ensure app.py is active.</p>
+                        </div>
+                    </div>
+
+                    <!-- Foot Control Buttons -->
+                    <div class="p-4 bg-slate-50/50 dark:bg-slate-900/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <button id="sessionToggleBtn" onclick="toggleSessionState()" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-2 rounded-xl text-sm shadow-md transition-all flex items-center space-x-2">
+                                <i id="sessionIcon" class="fa-solid fa-play"></i>
+                                <span id="sessionText">Start Session</span>
+                            </button>
+                            <button onclick="triggerCalibration()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-5 py-2 rounded-xl text-sm border border-slate-200/50 dark:border-slate-700/50 transition-all flex items-center space-x-2">
+                                <i class="fa-solid fa-crosshairs text-brand-500"></i>
+                                <span>Calibrate Baseline</span>
+                            </button>
+                        </div>
+                        <span class="text-xs text-slate-400 font-mono">Stream: 25 FPS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Sidebar Diagnostics Panel (5 Cols) -->
+            <div class="lg:col-span-5 flex flex-col space-y-6">
+                <!-- Current Posture Verdict Badge Card -->
+                <div id="verdictCard" class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm dark:shadow-none transition-all relative overflow-hidden">
+                    <div id="verdictGlow" class="absolute top-0 right-0 w-32 h-32 bg-slate-400/10 rounded-full blur-2xl pointer-events-none transition-all duration-300"></div>
+                    
+                    <span class="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest font-semibold mb-1">Posture Evaluation</span>
+                    <div id="verdictBadgeText" class="text-4xl font-black tracking-tight text-slate-400 mb-2 font-sans">STANDBY</div>
+                    <p id="verdictDescription" class="text-sm text-slate-600 dark:text-slate-300 max-w-sm">Launch a posture session to start analytics.</p>
+                </div>
+
+                <!-- Live Metrics Readout Card -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 flex flex-col space-y-5 transition-colors shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <span>Anatomical Diagnostics</span>
+                        <span id="calibIndicator" class="hidden text-[10px] bg-brand-100 text-brand-500 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Calibrated Offsets Active</span>
+                    </h3>
+
+                    <!-- Neck Inclination angle -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Neck Inclination Angle</span>
+                            <span id="ui-neck-val" class="text-sm font-bold text-slate-800 dark:text-white font-mono">0.0°</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div id="ui-neck-progress" class="bg-brand-500 h-full rounded-full transition-all duration-150" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Shoulder Slope percentage -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Shoulder Slope Offset</span>
+                            <span id="ui-shoulder-val" class="text-sm font-bold text-slate-800 dark:text-white font-mono">0.0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div id="ui-shoulder-progress" class="bg-brand-500 h-full rounded-full transition-all duration-150" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Session Stats Panel Card -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 transition-colors shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 pb-3 border-b border-slate-100 dark:border-slate-800">Session Status</h3>
+                    <div class="grid grid-cols-2 gap-4 pt-4 text-center">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider font-sans">Session Timer</span>
+                            <div id="ui-timer" class="text-2xl font-black tracking-wider text-slate-800 dark:text-white font-sans mt-0.5">00:00:00</div>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider font-sans">Alerts Fired</span>
+                            <div id="ui-alerts" class="text-2xl font-black tracking-wider text-rose-500 font-sans mt-0.5">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Detailed Explanation Landing Block -->
+    <section id="how-it-works" class="py-20 bg-slate-50 dark:bg-slate-900/50 transition-colors border-t border-slate-100 dark:border-slate-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-brand-500 font-extrabold text-xs uppercase tracking-widest bg-brand-100 dark:bg-brand-900/20 px-3 py-1 rounded-full">Methodology</span>
+                <h2 class="text-3xl md:text-4xl font-black mt-3 mb-4">Behind the Mechanics</h2>
+                <p class="text-slate-600 dark:text-slate-400 text-sm">Our platform leverages local system pose extraction to establish dynamic vector baselines.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <div class="w-10 h-10 bg-sky-100 dark:bg-sky-950/40 text-brand-500 rounded-xl flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-head-side-virus text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Forward Head Inclination</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Estimates slope metrics mapping ears to shoulder midpoints. Threshold deviations over 15° initiate corrective alarm countdowns to minimize cervical spine loads.</p>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                    <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-950/40 text-emerald-500 rounded-xl flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-arrows-left-right text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Shoulder Slope Percentage</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Computes height differences between left and right skeletal collar points relative to horizontal span. Slants exceeding 5% highlight unbalanced back strain distributions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 px-6 max-w-7xl mx-auto w-full">
+        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-3xl text-center relative overflow-hidden">
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-3">100% Secure & Local</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                PostureGuard runs fully on local host systems. No external databases, and no cloud-connected cameras. All computer-vision and pose computation loops operate in memory inside app.py and discard frames immediately after evaluation.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-900 py-8 px-6 text-center text-xs text-slate-400 dark:text-slate-500 transition-colors">
+        <p>&copy; 2026 PostureGuard Workspace Dashboard. Grounded in MediaPipe Local processing.</p>
+    </footer>
+
+    <script>
+        let ws;
+        let isMuted = false;
+        let sessionActive = false;
+        let audioCtx = null;
+
+        // Establish real-time JSON WebSocket telemetry channel
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log("Telemetry WebSocket channel connected successfully.");
+                document.getElementById('backendStatusBadge').innerHTML = `
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>Connected</span>
+                `;
+                document.getElementById('backendStatusBadge').className = "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase flex items-center space-x-1.5";
+            };
+
+            ws.onmessage = (event) => {
+                const telemetry = JSON.parse(event.data);
+                updateDiagnosticsUI(telemetry);
+                
+                // Play alarm when triggered
+                if (telemetry.alert_triggered) {
+                    playToneAlert();
+                }
+            };
+
+            ws.onclose = () => {
+                console.warn("WebSocket channel closed. Retrying connection in 3 seconds...");
+                document.getElementById('backendStatusBadge').innerHTML = `<span>Disconnected</span>`;
+                document.getElementById('backendStatusBadge').className = "bg-rose-500/10 text-rose-500 border border-rose-500/20 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase";
+                setTimeout(connectWebSocket, 3000);
+            };
+
+            ws.onerror = (err) => {
+                console.error("WebSocket encounter error:", err);
+            };
+        }
+
+        // Initialize Audio context on first click
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playToneAlert() {
+            if (isMuted) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            // Synthesis clean chime tone alert
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime); // High pitch bell E5
+            osc.frequency.exponentialRampToValueAtTime(440.0, audioCtx.currentTime + 0.4); // A4
+            
+            gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('muteIcon');
+            if (isMuted) {
+                icon.className = "fa-solid fa-volume-xmark text-rose-500";
+            } else {
+                icon.className = "fa-solid fa-volume-high text-brand-500";
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                icon.className = "fa-solid fa-moon text-lg";
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                icon.className = "fa-solid fa-sun text-lg";
+            }
+        }
+
+        function toggleSessionState() {
+            initAudio();
+            if (!sessionActive) {
+                // START session
+                sessionActive = true;
+                document.getElementById('sessionText').innerText = "Stop Session";
+                document.getElementById('sessionToggleBtn').className = "bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2 rounded-xl text-sm shadow-md transition-all flex items-center space-x-2";
+                document.getElementById('sessionIcon').className = "fa-solid fa-stop";
+                
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ action: "start_session" }));
+                }
+            } else {
+                // STOP session
+                sessionActive = false;
+                document.getElementById('sessionText').innerText = "Start Session";
+                document.getElementById('sessionToggleBtn').className = "bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-2 rounded-xl text-sm shadow-md transition-all flex items-center space-x-2";
+                document.getElementById('sessionIcon').className = "fa-solid fa-play";
+                
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ action: "stop_session" }));
+                }
+            }
+        }
+
+        function triggerCalibration() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ action: "calibrate" }));
+                document.getElementById('calibIndicator').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('calibIndicator').classList.add('hidden');
+                }, 4000);
+            }
+        }
+
+        function updateDiagnosticsUI(telemetry) {
+            // Update simple sidebar diagnostics
+            document.getElementById('ui-neck-val').innerText = `${telemetry.neck_angle.toFixed(1)}°`;
+            document.getElementById('ui-shoulder-val').innerText = `${telemetry.shoulder_slope.toFixed(1)}%`;
+            if (telemetry.elapsed_time) {
+                document.getElementById('ui-timer').innerText = telemetry.elapsed_time;
+            }
+            if (telemetry.alert_count !== undefined) {
+                document.getElementById('ui-alerts').innerText = telemetry.alert_count;
+            }
+
+            // Render Progress lines
+            const neckBar = document.getElementById('ui-neck-progress');
+            const shoulderBar = document.getElementById('ui-shoulder-progress');
+            
+            // Normalize progress widths (Max estimation limits: Neck 45, Shoulder 25)
+            const neckPct = Math.min(100, (telemetry.neck_angle / 45) * 100);
+            const shoulderPct = Math.min(100, (telemetry.shoulder_slope / 25) * 100);
+            
+            if (neckBar) neckBar.style.width = `${neckPct}%`;
+            if (shoulderBar) shoulderBar.style.width = `${shoulderPct}%`;
+
+            // Adjust progress colours on alarm thresh threshold limits
+            if (telemetry.neck_angle > 15) {
+                if (neckBar) {
+                    neckBar.classList.add('bg-rose-500');
+                    neckBar.classList.remove('bg-brand-500');
+                }
+            } else {
+                if (neckBar) {
+                    neckBar.classList.remove('bg-rose-500');
+                    neckBar.classList.add('bg-brand-500');
+                }
+            }
+
+            if (telemetry.shoulder_slope > 5) {
+                if (shoulderBar) {
+                    shoulderBar.classList.add('bg-rose-500');
+                    shoulderBar.classList.remove('bg-brand-500');
+                }
+            } else {
+                if (shoulderBar) {
+                    shoulderBar.classList.remove('bg-rose-500');
+                    shoulderBar.classList.add('bg-brand-500');
+                }
+            }
+
+            // Update Posture Verdict Badge Card
+            const badgeText = document.getElementById('verdictBadgeText');
+            const cardDesc = document.getElementById('verdictDescription');
+            const verdictCard = document.getElementById('verdictCard');
+            const verdictGlow = document.getElementById('verdictGlow');
+
+            badgeText.innerText = telemetry.verdict;
+
+            if (telemetry.verdict === "GOOD") {
+                badgeText.className = "text-4xl font-black tracking-tight text-emerald-500 mb-2";
+                cardDesc.innerText = "Sitting within healthy posture target baseline thresholds.";
+                verdictCard.className = "bg-white dark:bg-slate-900 border border-emerald-500/30 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm transition-all relative overflow-hidden glow-green";
+                verdictGlow.className = "absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none";
+            } else if (telemetry.verdict === "POOR") {
+                badgeText.className = "text-4xl font-black tracking-tight text-rose-500 mb-2";
+                cardDesc.innerText = "Deviating from optimal postural angle thresholds.";
+                verdictCard.className = "bg-white dark:bg-slate-900 border border-rose-500/30 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm transition-all relative overflow-hidden glow-red";
+                verdictGlow.className = "absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none";
+            } else {
+                badgeText.className = "text-4xl font-black tracking-tight text-slate-400 dark:text-slate-500 mb-2";
+                cardDesc.innerText = "Launch posture tracking session to start analytics.";
+                verdictCard.className = "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm transition-all relative overflow-hidden";
+                verdictGlow.className = "absolute top-0 right-0 w-32 h-32 bg-slate-400/10 rounded-full blur-2xl pointer-events-none";
+            }
+        }
+
+        function handleImageError() {
+            document.getElementById('offlineOverlay').classList.remove('hidden');
+        }
+
+        // Initialize script setup
+        window.addEventListener('load', () => {
+            connectWebSocket();
+        });
+    </script>
+</body>
+</html>
