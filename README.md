@@ -35,6 +35,10 @@ via a local Flask dashboard.
 - Python 3.10+ recommended
 - See `requirements.txt` (installs `mediapipe`, `opencv-python`, `Flask`, `pytest`, etc.)
 
+Prerequisite:
+- Download and place `pose_landmarker_lite.task` in the project root before running the app.
+  This model is required by the MediaPipe pose pipeline and must be available at the repository root.
+
 Install dependencies:
 ```bash
 pip install -r requirements.txt
@@ -93,8 +97,6 @@ pytest tests/test_angles.py -q
 - If MediaPipe fails to load the model, verify `pose_landmarker_lite.task` is
    present and readable in the project root.
 
-## Next steps
-- Add README badges for build/tests or a short demo GIF (optional).
 
-If you'd like, I can also run the tests or commit these README changes.
+
 
